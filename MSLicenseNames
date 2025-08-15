@@ -107,13 +107,15 @@ $SkuHashTable = @{
     "SPB"                                = "Microsoft 365 Business Premium"
 }
 
-$licenses = Get-AzureADSubscribedSku | Select-Object SkuId, SkuPartNumber
+$licenses = Get-AzureADSubscribedSku 
 
 $licensesWithName = $licenses | ForEach-Object {
     $license = $_
     $licenseName = $SkuHashTable[$license.SkuPartNumber]
+    $available = $license.PrepaidUnits.Enabled - $license.ConsumedUnits
     $license | Add-Member -MemberType NoteProperty -Name "LicenseName" -Value $licenseName -Force
+    $license | Add-Member -MemberType NoteProperty -Name "AvailableLicenses" -Value $available -Force
     $license
 }
 
-$licensesWithName | Select-Object SkuId, SkuPartNumber, LicenseName
+$licensesWithName | Select-Object SkuId, SkuPartNumber, LicenseName, AvailableLicenses
